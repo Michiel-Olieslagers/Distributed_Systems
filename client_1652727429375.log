@@ -1,0 +1,161 @@
+Connection established to port 4000
+Message sent to port 4000: LIST
+List operation started
+Message received from port 4000: LIST
+List operation successfully completed
+Message sent to port 4000: STORE test.txt 9
+Store operation started for file test.txt
+Message received from port 4000: STORE_TO 4001 4002 4003 4004
+Controller replied to store test.txt in these Dstores: 4001 4002 4003 4004 
+Connection established to port 4001
+Message sent to port 4001: STORE test.txt 9
+Storing file test.txt to Dstore 4001
+Message received from port 4001: ACK
+ACK received from Dstore 4001 to store file test.txt
+Store of file test.txt to Dstore 4001 successfully completed
+Connection established to port 4002
+Message sent to port 4002: STORE test.txt 9
+Storing file test.txt to Dstore 4002
+Message received from port 4002: ACK
+ACK received from Dstore 4002 to store file test.txt
+Store of file test.txt to Dstore 4002 successfully completed
+Connection established to port 4003
+Message sent to port 4003: STORE test.txt 9
+Storing file test.txt to Dstore 4003
+Message received from port 4003: ACK
+ACK received from Dstore 4003 to store file test.txt
+Store of file test.txt to Dstore 4003 successfully completed
+Connection established to port 4004
+Message sent to port 4004: STORE test.txt 9
+Storing file test.txt to Dstore 4004
+Message received from port 4004: ACK
+ACK received from Dstore 4004 to store file test.txt
+Store of file test.txt to Dstore 4004 successfully completed
+Timeout expired while reading from port 4000
+Message sent to port 4000: STORE test.txt 9
+Store operation started for file test.txt
+Message received from port 4000: STORE_TO 4005 4001 4002 4003
+Controller replied to store test.txt in these Dstores: 4005 4001 4002 4003 
+Connection established to port 4005
+Message sent to port 4005: STORE test.txt 9
+Storing file test.txt to Dstore 4005
+Message received from port 4005: ACK
+ACK received from Dstore 4005 to store file test.txt
+Store of file test.txt to Dstore 4005 successfully completed
+Connection established to port 4001
+Message sent to port 4001: STORE test.txt 9
+Storing file test.txt to Dstore 4001
+Message received from port 4001: ACK
+ACK received from Dstore 4001 to store file test.txt
+Store of file test.txt to Dstore 4001 successfully completed
+Connection established to port 4002
+Message sent to port 4002: STORE test.txt 9
+Storing file test.txt to Dstore 4002
+Message received from port 4002: ACK
+ACK received from Dstore 4002 to store file test.txt
+Store of file test.txt to Dstore 4002 successfully completed
+Connection established to port 4003
+Message sent to port 4003: STORE test.txt 9
+Storing file test.txt to Dstore 4003
+Message received from port 4003: ACK
+ACK received from Dstore 4003 to store file test.txt
+Store of file test.txt to Dstore 4003 successfully completed
+Timeout expired while reading from port 4000
+Message sent to port 4000: LIST
+List operation started
+Message received from port 4000: LIST
+List operation successfully completed
+Message sent to port 4000: LIST
+List operation started
+Message received from port 4000: LIST
+List operation successfully completed
+Connection established to port 4000
+Connection established to port 4000
+Connection established to port 4000
+Connection established to port 4000
+Connection established to port 4000
+Connection established to port 4000
+Connection established to port 4000
+Connection established to port 4000
+Connection established to port 4000
+Message sent to port 4000: LIST
+Message sent to port 4000: LIST
+List operation started
+Message sent to port 4000: LIST
+List operation started
+List operation started
+Message sent to port 4000: LIST
+Message sent to port 4000: LIST
+List operation started
+List operation started
+Message sent to port 4000: LIST
+Connection established to port 4000
+Message sent to port 4000: LIST
+Message sent to port 4000: LIST
+List operation started
+Message sent to port 4000: LIST
+List operation started
+List operation started
+Message received from port 4000: LIST
+Message received from port 4000: LIST
+Message sent to port 4000: LIST
+List operation successfully completed
+List operation started
+List operation successfully completed
+Message received from port 4000: LIST
+Message received from port 4000: LIST
+List operation successfully completed
+Message sent to port 4000: LIST
+Message sent to port 4000: LIST
+List operation started
+List operation started
+Message received from port 4000: LIST
+List operation successfully completed
+List operation started
+Message received from port 4000: LIST
+Message sent to port 4000: LIST
+List operation started
+Message received from port 4000: LIST
+List operation successfully completed
+List operation successfully completed
+Message received from port 4000: LIST
+Message received from port 4000: LIST
+Message sent to port 4000: LIST
+List operation successfully completed
+List operation successfully completed
+Message received from port 4000: LIST
+List operation successfully completed
+Message sent to port 4000: LIST
+List operation started
+List operation started
+Message received from port 4000: LIST
+List operation successfully completed
+List operation successfully completed
+Message received from port 4000: LIST
+Message sent to port 4000: LIST
+List operation started
+List operation successfully completed
+Message sent to port 4000: LIST
+Message received from port 4000: LIST
+List operation successfully completed
+Message received from port 4000: LIST
+List operation started
+Message received from port 4000: LIST
+Message received from port 4000: LIST
+Message received from port 4000: LIST
+List operation successfully completed
+List operation successfully completed
+List operation successfully completed
+List operation successfully completed
+Message sent to port 4000: LIST
+List operation started
+Message sent to port 4000: LIST
+List operation started
+Message sent to port 4000: LIST
+List operation started
+Message received from port 4000: LIST
+Message received from port 4000: LIST
+List operation successfully completed
+List operation successfully completed
+Message received from port 4000: LIST
+List operation successfully completed
