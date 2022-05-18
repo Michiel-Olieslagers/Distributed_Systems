@@ -90,8 +90,7 @@ class ClientTest {
 					msg = "LOAD "+file.getName();
 					outPW.println(msg);
 					outPW.flush();
-					while((line = inBR.readLine()) == null){
-					}
+					line = inBR.readLine();
 					lines = line.split(" ");
 					if(lines[0].equals("LOAD_FROM")){
 						socket = new Socket(InetAddress.getLocalHost(),Integer.parseInt(lines[1]));
@@ -100,15 +99,11 @@ class ClientTest {
 						in = socket.getInputStream();
 						inBR = new BufferedReader(new InputStreamReader(in));
 						FileOutputStream output = new FileOutputStream(file);
+						int size = Integer.parseInt(lines[2]);
 						msg = "LOAD_DATA test.txt";
 						outPW.println(msg);
 						outPW.flush();
-						while((line = inBR.readLine()) == null){
-						}
-						output.write(line.getBytes());
-						while ((line=inBR.readLine()) != null){
-							output.write(line.getBytes());
-						}
+						output.write(in.readNBytes(size));
 					}
 				}
 				else if(str.equals("3")){
@@ -123,8 +118,7 @@ class ClientTest {
 					msg = "REMOVE " + file.getName();
 					outPW.println(msg);
 					outPW.flush();
-					while((line = inBR.readLine()) == null){
-					}
+					line = inBR.readLine();
 					System.out.println(line);
 				}
 				else if(str.equals("4")){

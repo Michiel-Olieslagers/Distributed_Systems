@@ -36,6 +36,7 @@ class ConnectedThread extends Thread{
 					output.write(bytes);
 					output.close();
 					Dstore.sendStoreAck(lines[1]);
+					System.out.println("Store ack sent");
 				} else if (lines[0].equals("LOAD_DATA")) {
 					System.out.println("Loading " + lines[1]);
 					File inputFile = new File(path + File.separator + lines[1]);
@@ -47,6 +48,7 @@ class ConnectedThread extends Thread{
 					File inputFile = new File(path + File.separator + lines[1]);
 					inputFile.delete();
 					Dstore.sendRemoveAck(lines[1]);
+					System.out.println("Remove ack sent");
 				} else if (lines[0].equals("LIST")) {
 					System.out.println("Listing");
 					File inputFile = new File(path);

@@ -48,11 +48,9 @@ class ClientThread extends Thread{
 	private ArrayList<FileStore> dStores;
 	private Socket client;
 	private int repFactor = Controller.getRepFac();
-	private ArrayList<Index> indexes;
 
-	public ClientThread(Socket client, ArrayList<Index> indexes, ArrayList<FileStore> dStores){
+	public ClientThread(Socket client, ArrayList<FileStore> dStores){
 		this.client = client;
-		this.indexes = indexes;
 		this.dStores = dStores;
 	}
 
@@ -70,14 +68,14 @@ class ClientThread extends Thread{
 					if(dStores.size() >= repFactor) {
 						System.out.println("Store in progress");
 						boolean bool = true;
-						for (Index ind : indexes) {
-							if (ind.getFilename().equals(cmd[1]) && !ind.getStatus().equals("remove in progress") && !ind.getStatus().equals("store in progress")) {
+						for (Index ind : Controller.getIndexes()) {
+							if (ind.getFilename().equals(cmd[1]) && !ind.getStatus().equals("remove in progress") && !ind.getStatus().equals("store complete") && !ind.getStatus().equals("store in progress")) {
 								bool = false;
 							}
 						}
 						if (bool) {
 							Index index = new Index(cmd[1]);
-							indexes.add(index);
+							Controller.addIndex(index);
 							index.setStoreInProgress(this);
 							send(cmd[1], Integer.parseInt(cmd[2]));
 						} else {
@@ -94,8 +92,8 @@ class ClientThread extends Thread{
 				} else if (cmd[0].equals("LOAD")) {
 					if(dStores.size() >= repFactor) {
 						boolean bool = false;
-						for (Index ind : indexes) {
-							if (ind.getFilename().equals(cmd[1]) && !ind.getStatus().equals("remove in progress") && !ind.getStatus().equals("store in progress")) {
+						for (Index ind : Controller.getIndexes()) {
+							if (ind.getFilename().equals(cmd[1]) && !ind.getStatus().equals("remove in progress") && !ind.getStatus().equals("store in progress") && !ind.getStatus().equals("remove complete")) {
 								bool = true;
 							}
 						}
@@ -128,8 +126,8 @@ class ClientThread extends Thread{
 				} else if (cmd[0].equals("REMOVE")) {
 					if (dStores.size() >= repFactor) {
 						Index index = null;
-						for (Index ind : indexes) {
-							if (ind.getFilename().equals(cmd[1]) && !ind.getStatus().equals("remove in progress") && !ind.getStatus().equals("store in progress")) {
+						for (Index ind : Controller.getIndexes()) {
+							if (ind.getFilename().equals(cmd[1]) && !ind.getStatus().equals("remove in progress") && !ind.getStatus().equals("remove complete") && !ind.getStatus().equals("store in progress")) {
 								index = ind;
 							}
 						}
@@ -197,7 +195,7 @@ class ClientThread extends Thread{
 	public void retrieve(String fileName) throws IOException{
 		try{
 			Index index = null;
-			for(Index ind : indexes){
+			for(Index ind : Controller.getIndexes()){
 				if(ind.getFilename().equals(fileName)){
 					index = ind;
 				}
@@ -278,7 +276,7 @@ class ClientThread extends Thread{
 		}
 	}
 
-	public void sendRemoveComplete(Index index){
+	public void sendRemoveComplete(){
 		try{
 			PrintWriter outPW = new PrintWriter(client.getOutputStream());
 			outPW.println("REMOVE_COMPLETE");
@@ -286,8 +284,8 @@ class ClientThread extends Thread{
 		}
 		catch(Exception e){
 			System.out.println("error " + e);
+			System.out.println("Test");
 		}
-		Controller.removeIndex(index);
 	}
 
 	public Socket getClient(){
@@ -303,12 +301,10 @@ class DStoreThread extends Thread{
 	private PrintWriter outPW;
 	private BufferedReader inBR;
 	private String response = null;
-	private ArrayList<Index> indexes;
 
-	public DStoreThread(Socket client, int port, ArrayList<Index> indexes){
+	public DStoreThread(Socket client, int port){
 		this.client = client;
 		this.port = port;
-		this.indexes = indexes;
 		try {
 			this.out = client.getOutputStream();
 			this.outPW = new PrintWriter(this.out);
@@ -333,14 +329,19 @@ class DStoreThread extends Thread{
 					response = line;
 				}
 				else if(lines[0].equals("REMOVE_ACK")){
-					for(Index index : indexes){
+					Index changed = null;
+					for(Index index : Controller.getIndexes()){
 						if(index.getFilename().equals(lines[1]) && index.getStatus().equals("remove in progress")){
+							changed = index;
 							index.reduceRemove();
 						}
 					}
+					if(changed.getStatus().equals("remove complete")){
+						Controller.removeIndex(changed);
+					}
 				}
 				else if(lines[0].equals("STORE_ACK")){
-					for(Index index : indexes){
+					for(Index index : Controller.getIndexes()){
 						if(index.getFilename().equals(lines[1]) && index.getStatus().equals("store in progress")){
 							index.reduceStore();
 						}
@@ -431,7 +432,7 @@ class Index {
 	}
 
 	public void setStoreInProgress(ClientThread client){
-		System.out.println("Check");
+		System.out.println(Controller.getDstores().size());
 		this.status.set("store in progress");
 		storeCount = new AtomicInteger(Controller.getRepFac());
 		storeClient.set(client);
@@ -472,27 +473,23 @@ class Index {
 	}
 
 	public void reduceStore(){
-		int count = storeCount.decrementAndGet();
-		System.out.println(count);
-		if(count == 0){
+		if(storeCount.decrementAndGet() == 0){
 			status.set("store complete");
 			storeClient.get().sendStoreComplete();
 		}
 	}
 
 	public void reduceRemove(){
-		int count = removeCount.decrementAndGet();
-		System.out.println(count);
-		if(count == 0){
+		if(removeCount.decrementAndGet() == 0){
 			status.set("remove complete");
-			removeClient.get().sendRemoveComplete(this);
+			removeClient.get().sendRemoveComplete();
 		}
 	}
 }
 
 class Controller {
 	private static ServerSocket ss;
-	private static ArrayList<Index> indexes = new ArrayList<>();
+	private static AtomicReference<ArrayList<Index>> indexes = new AtomicReference<>(new ArrayList<>());
 	private static int repFac;
 	private static int port;
 	private static int timeOut;
@@ -500,6 +497,9 @@ class Controller {
 	private static ArrayList<DStoreThread> dStoreThreads = new ArrayList<>();
 	private static ArrayList<ClientThread> clients = new ArrayList<>();
 	private static ArrayList<FileStore> dStores = new ArrayList<>();
+
+	private static Object indexLock = new Object();
+
 	public static void main(String [] args){
 		setup(args);
 		try{
@@ -520,7 +520,7 @@ class Controller {
 						}
 					}
 					if(newThread) {
-						ClientThread thread = new ClientThread(client, indexes, dStores);
+						ClientThread thread = new ClientThread(client, dStores);
 						thread.start();
 						clients.add(thread);
 					}
@@ -729,7 +729,7 @@ class Controller {
 	public static void addDStore(Socket dStore, int port, ClientThread thread){
 		dStores.add(new FileStore(port));
 		clients.remove(thread);
-		DStoreThread newThread = new DStoreThread(dStore, port, indexes);
+		DStoreThread newThread = new DStoreThread(dStore, port);
 		newThread.start();
 		dStoreThreads.add(newThread);
 		System.out.println(dStores.size());
@@ -750,7 +750,7 @@ class Controller {
 					}
 				}
 				if(!contains){
-					for (Index ind : indexes) {
+					for (Index ind : indexes.get()) {
 						if (!ind.getStatus().equals("store in progress") && ind.getFilename().equals(fileName)) {
 							list.add(fileName);
 						}
@@ -795,11 +795,24 @@ class Controller {
 	}
 
 	public static void removeIndex(Index index){
-		indexes.remove(index);
+		synchronized (indexLock) {
+			indexes.get().remove(index);
+		}
 	}
 
 	public static ArrayList<FileStore> getDstores(){
-		return dStores;
+			return dStores;
 	}
 
+	public static ArrayList<Index> getIndexes(){
+		synchronized (indexLock) {
+			return indexes.get();
+		}
+	}
+
+	public static void addIndex(Index index){
+		synchronized (indexLock) {
+			indexes.get().add(index);
+		}
+	}
 }
